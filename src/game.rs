@@ -3,17 +3,15 @@ use crate::board::{Board};
 
 pub struct Game<'lifetime> {
     pub board: &'lifetime mut Board,
-    pub alive: u64,
     pub ticks: u128,
 }
 
 struct Neighbours (bool, bool, bool, bool, bool, bool, bool, bool);
 
 impl Game<'_> {
-    pub fn new(board: &mut Board, alive: u64) -> Game {
+    pub fn new(board: &mut Board) -> Game {
         Game {
             board,
-            alive,
             ticks: 0,
         }
     }
@@ -56,15 +54,10 @@ impl Game<'_> {
     }
 
     pub fn next_tick(&mut self) {
-        // self.ticks += 1;
+        self.ticks += 1;
         for x in 0..self.board.size as usize {
             for y in 0..self.board.size as usize {
                 let next_state = self.get_cell_next_state(self.board.size as usize, x, y);
-                if next_state {
-                    self.alive += 1;
-                } else if self.alive > 0 {
-                    self.alive -= 1;
-                }
                 self.board.set(x as u32, y as u32, next_state);
             }
         }
@@ -73,7 +66,7 @@ impl Game<'_> {
     pub fn start(&mut self, stdout: &Stdout) {
         loop {
             self.next_tick();
-            self.board.print(&stdout, self.board.size);
+            self.board.print(&stdout, self.board.size, self.ticks);
             std::thread::sleep(std::time::Duration::from_millis(50));
         }
     }

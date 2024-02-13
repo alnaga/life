@@ -8,34 +8,30 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new (size: u16, probability: f64) -> (Board, u64) {
+    pub fn new (size: u16, probability: f64) -> Board {
         let mut rng = thread_rng();
-        let mut alive: u64 = 0;
         let mut board = Vec::new();
         for _ in 0..size {
             let mut row = Vec::new();
             for _ in 0..size {
                 let value = rng.gen_bool(probability);
-                if value {
-                    alive += 1;
-                }
                 row.push(value);
             }
             board.push(row);
         }
-        (Board {
+        Board {
             grid: board,
             size,
-        }, alive)
+        }
     }
 
     pub fn set (&mut self, x: u32, y: u32, value: bool) {
         self.grid[x as usize][y as usize] = value;
     }
 
-    pub fn print (&self, mut stdout: &Stdout, num_rows: u16) {
+    pub fn print (&self, mut stdout: &Stdout, num_rows: u16, ticks: u128) {
         // Overwrite the previously displayed board
-        stdout.execute(cursor::MoveUp(num_rows)).unwrap();
+        stdout.execute(cursor::MoveUp(num_rows + 1)).unwrap();
         stdout.execute(terminal::Clear(terminal::ClearType::FromCursorDown)).unwrap();
         for row in &self.grid {
             let mut line = String::from("");
@@ -46,7 +42,8 @@ impl Board {
                     line.push(std::char::from_u32(0x2581).unwrap_or_else(|| '�'));
                 }
             }
-            writeln!(stdout, "{}", line).expect("TODO: panic message");
+            writeln!(stdout, "{}", line).unwrap();
         }
+        writeln!(stdout, "Ticks: {}", ticks).unwrap();
     }
 }
