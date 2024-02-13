@@ -16,6 +16,9 @@ impl Board {
             let mut row = Vec::new();
             for _ in 0..size {
                 let value = rng.gen_bool(probability);
+                if value {
+                    alive += 1;
+                }
                 row.push(value);
             }
             board.push(row);

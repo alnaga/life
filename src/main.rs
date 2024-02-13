@@ -14,11 +14,10 @@ fn main() {
     let size = utils::parse_u16_input("Enter the size of the board: ");
     let probability = utils::parse_f64_input("What probability for aliveness do you want to use: ");
     println!("Creating a {}x{} board with p={}...", size, size, probability);
-    let mut game_board_tuple = board::Board::new(size, probability);
+    let game_board_tuple = board::Board::new(size, probability);
     let mut game_board = game_board_tuple.0;
-    let mut alive = game_board_tuple.1;
+    let alive = game_board_tuple.1;
     println!("Done!");
-    // game_board.print(&stdout, size);
 
     let mut game = game::Game::new(&mut game_board, alive);
     game.start(&mut stdout);
