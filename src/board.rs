@@ -30,9 +30,8 @@ impl Board {
     }
 
     pub fn print (&self, mut stdout: &Stdout, num_rows: u16, ticks: u128) {
-        // Overwrite the previously displayed board
-        stdout.execute(cursor::MoveUp(num_rows + 1)).unwrap();
-        stdout.execute(terminal::Clear(terminal::ClearType::FromCursorDown)).unwrap();
+        let mut new_display = String::new();
+
         for row in &self.grid {
             let mut line = String::from("");
             for cell in row {
@@ -42,8 +41,12 @@ impl Board {
                     line.push(std::char::from_u32(0x2581).unwrap_or_else(|| '�'));
                 }
             }
-            writeln!(stdout, "{}", line).unwrap();
+            new_display.push_str(&line);
+            new_display.push_str("\n");
         }
+        // Overwrite the previously displayed board + the newline
+        stdout.execute(cursor::MoveUp(num_rows + 2)).unwrap();
+        writeln!(stdout, "{}", new_display).unwrap();
         writeln!(stdout, "Ticks: {}", ticks).unwrap();
     }
 }
